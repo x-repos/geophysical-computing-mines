@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -133,5 +134,3 @@ int main(){
     backwardSubstitution(u, y, x, n);
     print1DMatrix(x,n);
 }
-
-
