@@ -1,8 +1,14 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+
+// Allocation
+//////////////////////////////////////////////////////////////////
+float* allocate1DArray(int n){
+    float* array = (float*)malloc(n * sizeof(float));
+    return array;
+}
 
 float** allocate2DArray(int rows, int cols) {
     /*
@@ -26,6 +32,8 @@ float** allocate2DArray(int rows, int cols) {
     return matrix;
 }
 
+// Nothing
+//////////////////////////////////////////////////////////////////
 void print1DMatrix(float *a, int n){
     for (int i = 0; i < n; i++) { 
         printf("%f\n", a[i]);
@@ -42,21 +50,8 @@ void print2DMatrix(float **a, int n){
     }
 }
 
-
-void random2DArray(float** a, int n){
-    srand(time(NULL));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            a[i][j] = (float)rand() / RAND_MAX;
-}
-
-void random1DArray(float* a, int n){
-    srand(time(NULL));
-    for (int i = 0; i < n; i++){
-        a[i] = (float)rand() / RAND_MAX;
-    }
-}
-
+// Solve the system of equations
+//////////////////////////////////////////////////////////////////
 void luDecomp(float** a, float** l, float** u, int n) {
     for (int i = 0; i < n; i++){
         l[i][i] = 1.0;
@@ -103,15 +98,23 @@ void backwardSubstitution(float** u, float* y, float* x, int n) {
     }
 }
 
+void linalgsolve(float** a, float* b, int n){
+    float** l = allocate2DArray(n,n);
+    float** u = allocate2DArray(n,n);
+    float*  x = (float*)malloc(n * sizeof(float));
+    float*  y = (float*)malloc(n * sizeof(float));
+
+    luDecomp(a, l, u, n);
+    forwardSubstitution(l, b, y, n);
+    backwardSubstitution(u, y, x, n);
+    print1DMatrix(x,n);
+}
+//////////////////////////////////////////////////////////////////
+
 int main(){
     int n = 3;
     float** a = allocate2DArray(n,n);
     float*  b = (float*)malloc(n * sizeof(float));
-    float*  y = (float*)malloc(n * sizeof(float));
-    float*  x = (float*)malloc(n * sizeof(float));
-    // random2DArray(a, n);
-    // random1DArray(b, n);
-
     float values[3][3] = {
         {1.0, 4.0, 5.0},
         {6.0, 8.0, 22.0},
@@ -127,10 +130,5 @@ int main(){
     for (int i = 0; i < n; i++) {
         b[i] = bvalues[i];
     }
-    float** l = allocate2DArray(n,n);
-    float** u = allocate2DArray(n,n);
-    luDecomp(a, l, u, n);
-    forwardSubstitution(l, b, y, n);
-    backwardSubstitution(u, y, x, n);
-    print1DMatrix(x,n);
+    linalgsolve(a,b,n);
 }
